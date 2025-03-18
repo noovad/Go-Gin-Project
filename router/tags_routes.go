@@ -21,7 +21,6 @@ func TagsRouter(db *gorm.DB, router *gin.Engine, validate *validator.Validate) {
 		tagsRouter.GET("/:tagId", tagsController.FindById)
 		tagsRouter.POST("", tagsController.Create)
 		tagsRouter.PATCH("/:tagId", tagsController.Update)
-		tagsRouter.PATCH("/:tagId", tagsController.Update)
 		tagsRouter.DELETE("/:tagId", tagsController.Delete)
 	}
 }
