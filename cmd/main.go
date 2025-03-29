@@ -9,7 +9,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 )
 
@@ -28,8 +27,7 @@ func main() {
 		log.Fatal("Database migration failed:", err)
 	}
 
-	validate := validator.New()
-	router := router.SetupRouter(db, validate)
+	router := router.SetupRouter()
 
 	server := &http.Server{
 		Addr:           ":" + os.Getenv("PORT"),
