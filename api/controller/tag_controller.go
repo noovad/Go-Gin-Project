@@ -1,11 +1,11 @@
 package controller
 
 import (
+	"go-gin-project/api/service"
+	"go-gin-project/data"
+	"go-gin-project/helper"
 	"net/http"
 	"strconv"
-	"todo-project/api/service"
-	"todo-project/data"
-	"todo-project/helper"
 
 	"github.com/gin-gonic/gin"
 )

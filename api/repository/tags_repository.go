@@ -2,9 +2,9 @@ package repository
 
 import (
 	"errors"
-	"todo-project/data"
-	"todo-project/helper"
-	"todo-project/model"
+	"go-gin-project/data"
+	"go-gin-project/helper"
+	"go-gin-project/model"
 
 	"gorm.io/gorm"
 )
@@ -24,7 +24,6 @@ func NewTagsREpositoryImpl(Db *gorm.DB) TagsRepository {
 type TagsRepositoryImpl struct {
 	Db *gorm.DB
 }
-
 
 func (t *TagsRepositoryImpl) Delete(tagsId int) {
 	var tags model.Tags
