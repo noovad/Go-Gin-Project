@@ -1,9 +1,9 @@
 package router
 
 import (
-	"todo-project/api/controller"
-	"todo-project/api/repository"
-	"todo-project/api/service"
+	"go-gin-project/api/controller"
+	"go-gin-project/api/repository"
+	"go-gin-project/api/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
