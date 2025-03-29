@@ -1,10 +1,10 @@
 package service
 
 import (
-	"todo-project/api/repository"
-	"todo-project/data"
-	"todo-project/helper"
-	"todo-project/model"
+	"go-gin-project/api/repository"
+	"go-gin-project/data"
+	"go-gin-project/helper"
+	"go-gin-project/model"
 
 	"github.com/go-playground/validator/v10"
 )

@@ -1,13 +1,13 @@
 package main
 
 import (
+	"go-gin-project/config"
+	"go-gin-project/model"
+	"go-gin-project/router"
 	"log"
 	"net/http"
 	"os"
 	"time"
-	"todo-project/config"
-	"todo-project/model"
-	"todo-project/router"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
