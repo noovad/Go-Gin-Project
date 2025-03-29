@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"go-gin-project/api/repository"
 	"go-gin-project/data"
 	"go-gin-project/helper"
@@ -10,16 +11,16 @@ import (
 )
 
 type TagsService interface {
-	Create(tags data.CreateTagsRequest)
-	Update(tags data.UpdateTagsRequest)
-	Delete(tagsId int)
-	FindById(tagsId int) data.TagsResponse
-	FindAll() []data.TagsResponse
+	Create(tag data.TagRequest) error
+	FindAll() ([]data.TagResponse, error)
+	FindById(tagId string) (data.TagResponse, error)
+	Update(tagId string, tag data.TagRequest) error
+	Delete(tagId int) error
 }
 
-func NewTagsServiceImpl(tagRepository repository.TagsRepository, validate *validator.Validate) TagsService {
+func NewTagsServiceImpl(tagsRepository repository.TagsRepository, validate *validator.Validate) TagsService {
 	return &TagsServiceImpl{
-		TagsRepository: tagRepository,
+		TagsRepository: tagsRepository,
 		Validate:       validate,
 	}
 }
@@ -29,48 +30,75 @@ type TagsServiceImpl struct {
 	Validate       *validator.Validate
 }
 
-func (t *TagsServiceImpl) Create(tags data.CreateTagsRequest) {
-	err := t.Validate.Struct(tags)
-	helper.ErrorPanic(err)
-	tagModel := model.Tags{
-		Name: tags.Name,
+func (t *TagsServiceImpl) Create(tag data.TagRequest) error {
+	err := t.Validate.Struct(tag)
+	if err != nil {
+		return helper.ErrFailedValidationWrap(err)
 	}
-	t.TagsRepository.Save(tagModel)
+	tagModel := model.Tags{
+		Name: tag.Name,
+	}
+	return t.TagsRepository.Save(tagModel)
 }
 
-func (t *TagsServiceImpl) Delete(tagsId int) {
-	t.TagsRepository.Delete(tagsId)
-}
+func (t *TagsServiceImpl) FindAll() ([]data.TagResponse, error) {
+	result, err := t.TagsRepository.FindAll()
+	if err != nil {
+		return nil, err
+	}
 
-func (t *TagsServiceImpl) FindAll() []data.TagsResponse {
-	result := t.TagsRepository.FindAll()
-
-	var tags []data.TagsResponse
+	var tags []data.TagResponse
 	for _, value := range result {
-		tag := data.TagsResponse{
+		tag := data.TagResponse{
 			Id:   value.Id,
 			Name: value.Name,
 		}
 		tags = append(tags, tag)
 	}
 
-	return tags
+	return tags, nil
 }
 
-func (t *TagsServiceImpl) FindById(tagsId int) data.TagsResponse {
-	tagData, err := t.TagsRepository.FindById(tagsId)
-	helper.ErrorPanic(err)
+func (t *TagsServiceImpl) FindById(tagId string) (data.TagResponse, error) {
+	tagData, err := t.TagsRepository.FindById(tagId)
+	if err != nil {
+		return data.TagResponse{}, err
+	}
 
-	tagResponse := data.TagsResponse{
+	tagResponse := data.TagResponse{
 		Id:   tagData.Id,
 		Name: tagData.Name,
 	}
-	return tagResponse
+
+	return tagResponse, nil
 }
 
-func (t *TagsServiceImpl) Update(tags data.UpdateTagsRequest) {
-	tagData, err := t.TagsRepository.FindById(tags.Id)
-	helper.ErrorPanic(err)
-	tagData.Name = tags.Name
-	t.TagsRepository.Update(tagData)
+func (t *TagsServiceImpl) Update(tagId string, tag data.TagRequest) error {
+	err := t.Validate.Struct(tag)
+	if err != nil {
+		return helper.ErrFailedValidationWrap(err)
+	}
+
+	tagData, err := t.TagsRepository.FindById(tagId)
+	if err != nil {
+		return err
+	}
+
+	if tagData.Id == 0 {
+		return helper.ErrNotFound
+	}
+
+	tagData.Name = tag.Name
+	return t.TagsRepository.Update(tagData)
+}
+
+func (t *TagsServiceImpl) Delete(tagId int) error {
+	err := t.TagsRepository.Delete(tagId)
+	if err != nil {
+		if errors.Is(err, helper.ErrNotFound) {
+			return helper.ErrNotFound
+		}
+		return err
+	}
+	return nil
 }

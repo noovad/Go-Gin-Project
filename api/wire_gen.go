@@ -17,7 +17,7 @@ import (
 
 func InitializeTagsController() *controller.TagsController {
 	db := config.DatabaseConnection()
-	tagsRepository := repository.NewTagsREpositoryImpl(db)
+	tagsRepository := repository.NewTagsRepositoryImpl(db)
 	validate := config.NewValidator()
 	tagsService := service.NewTagsServiceImpl(tagsRepository, validate)
 	tagsController := controller.NewTagsController(tagsService)
