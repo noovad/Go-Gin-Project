@@ -2,7 +2,6 @@ package repository
 
 import (
 	"errors"
-	"go-gin-project/data"
 	"go-gin-project/helper"
 	"go-gin-project/model"
 
@@ -10,14 +9,14 @@ import (
 )
 
 type TagsRepository interface {
-	Save(tags model.Tags)
-	Update(tags model.Tags)
-	Delete(tagsId int)
-	FindById(tagsId int) (tags model.Tags, err error)
-	FindAll() []model.Tags
+	Save(tag model.Tags) error
+	FindAll() ([]model.Tags, error)
+	FindById(tagId string) (tag model.Tags, err error)
+	Update(tag model.Tags) error
+	Delete(tagId int) error
 }
 
-func NewTagsREpositoryImpl(Db *gorm.DB) TagsRepository {
+func NewTagsRepositoryImpl(Db *gorm.DB) TagsRepository {
 	return &TagsRepositoryImpl{Db: Db}
 }
 
@@ -25,39 +24,50 @@ type TagsRepositoryImpl struct {
 	Db *gorm.DB
 }
 
-func (t *TagsRepositoryImpl) Delete(tagsId int) {
-	var tags model.Tags
-	result := t.Db.Where("id = ?", tagsId).Delete(&tags)
-	helper.ErrorPanic(result.Error)
+func (t *TagsRepositoryImpl) Save(tag model.Tags) error {
+	result := t.Db.Create(&tag)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
-func (t *TagsRepositoryImpl) FindAll() []model.Tags {
+func (t *TagsRepositoryImpl) FindAll() ([]model.Tags, error) {
 	var tags []model.Tags
 	result := t.Db.Find(&tags)
-	helper.ErrorPanic(result.Error)
-	return tags
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return tags, nil
 }
 
-func (t *TagsRepositoryImpl) FindById(tagsId int) (tags model.Tags, err error) {
+func (t *TagsRepositoryImpl) FindById(tagId string) (tagModel model.Tags, err error) {
 	var tag model.Tags
-	result := t.Db.Find(&tag, tagsId)
-	if result != nil {
-		return tag, nil
-	} else {
-		return tag, errors.New("tag is not found")
+	result := t.Db.First(&tag, tagId)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return model.Tags{}, helper.ErrNotFound
+	} else if result.Error != nil {
+		return model.Tags{}, result.Error
 	}
+
+	return tag, nil
 }
 
-func (t *TagsRepositoryImpl) Save(tags model.Tags) {
-	result := t.Db.Create(&tags)
-	helper.ErrorPanic(result.Error)
+func (t *TagsRepositoryImpl) Update(tags model.Tags) error {
+	result := t.Db.Model(&tags).Updates(tags)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
-func (t *TagsRepositoryImpl) Update(tags model.Tags) {
-	var updateTag = data.UpdateTagsRequest{
-		Id:   tags.Id,
-		Name: tags.Name,
+func (t *TagsRepositoryImpl) Delete(tagsId int) error {
+	result := t.Db.Delete(&model.Tags{}, tagsId)
+	if result.Error != nil {
+		return result.Error
 	}
-	result := t.Db.Model(&tags).Updates(updateTag)
-	helper.ErrorPanic(result.Error)
+	if result.RowsAffected == 0 {
+		return helper.ErrNotFound
+	}
+	return nil
 }
