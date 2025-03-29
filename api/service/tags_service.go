@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"go-gin-project/api/repository"
 	"go-gin-project/data"
 	"go-gin-project/helper"
@@ -93,11 +92,7 @@ func (t *TagsServiceImpl) Update(tagId string, tag data.TagRequest) error {
 }
 
 func (t *TagsServiceImpl) Delete(tagId int) error {
-	err := t.TagsRepository.Delete(tagId)
-	if err != nil {
-		if errors.Is(err, helper.ErrNotFound) {
-			return helper.ErrNotFound
-		}
+	if err := t.TagsRepository.Delete(tagId); err != nil {
 		return err
 	}
 	return nil

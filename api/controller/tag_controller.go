@@ -94,13 +94,13 @@ func (controller *TagsController) Delete(ctx *gin.Context) {
 	tagId := ctx.Param("tagId")
 	id, err := strconv.Atoi(tagId)
 	if err != nil {
-		responsejson.InternalServerError(ctx, err)
+		responsejson.BadRequest(ctx, err)
 		return
 	}
-	err = controller.tagsService.Delete(id)
-	if err != nil {
+
+	if err := controller.tagsService.Delete(id); err != nil {
 		if errors.Is(err, helper.ErrNotFound) {
-			responsejson.NotFound(ctx, err.Error())
+			responsejson.NotFound(ctx, "Tag not found")
 			return
 		}
 		responsejson.InternalServerError(ctx, err)
