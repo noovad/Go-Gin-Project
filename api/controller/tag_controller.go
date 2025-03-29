@@ -1,10 +1,11 @@
 package controller
 
 import (
+	"errors"
 	"go-gin-project/api/service"
 	"go-gin-project/data"
 	"go-gin-project/helper"
-	"net/http"
+	"go-gin-project/helper/responsejson"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -21,80 +22,90 @@ func NewTagsController(service service.TagsService) *TagsController {
 }
 
 func (controller *TagsController) Create(ctx *gin.Context) {
-	createTagsRequest := data.CreateTagsRequest{}
+	createTagsRequest := data.TagRequest{}
 	err := ctx.ShouldBindJSON(&createTagsRequest)
-	helper.ErrorPanic(err)
-
-	controller.tagsService.Create(createTagsRequest)
-	webResponse := data.Response{
-		Code:   http.StatusOK,
-		Status: "Ok",
-		Data:   nil,
+	if err != nil {
+		responsejson.InternalServerError(ctx, err)
+		return
 	}
-	ctx.Header("Content-Type", "application/json")
-	ctx.JSON(http.StatusOK, webResponse)
+
+	err = controller.tagsService.Create(createTagsRequest)
+	if err != nil {
+		if errors.Is(err, helper.ErrFailedValidation) {
+			responsejson.BadRequest(ctx, err)
+			return
+		}
+		responsejson.InternalServerError(ctx, err)
+		return
+	}
+	responsejson.Success(ctx, "create", nil)
+}
+
+func (controller *TagsController) FindAll(ctx *gin.Context) {
+	tagResponse, err := controller.tagsService.FindAll()
+	if err != nil {
+		responsejson.InternalServerError(ctx, err)
+		return
+	}
+	responsejson.Success(ctx, "read", tagResponse)
+}
+
+func (controller *TagsController) FindById(ctx *gin.Context) {
+	tagId := ctx.Param("tagId")
+
+	tagResponse, err := controller.tagsService.FindById(tagId)
+	if err != nil {
+		if errors.Is(err, helper.ErrNotFound) {
+			responsejson.NotFound(ctx, err.Error())
+			return
+		}
+		responsejson.InternalServerError(ctx, err)
+		return
+	}
+	responsejson.Success(ctx, "read", tagResponse)
 }
 
 func (controller *TagsController) Update(ctx *gin.Context) {
-	updateTagsRequest := data.UpdateTagsRequest{}
-	err := ctx.ShouldBindJSON(&updateTagsRequest)
-	helper.ErrorPanic(err)
-
 	tagId := ctx.Param("tagId")
-	id, err := strconv.Atoi(tagId)
-	helper.ErrorPanic(err)
-	updateTagsRequest.Id = id
-
-	controller.tagsService.Update(updateTagsRequest)
-
-	webResponse := data.Response{
-		Code:   http.StatusOK,
-		Status: "Ok",
-		Data:   nil,
+	updateTagsRequest := data.TagRequest{}
+	err := ctx.ShouldBindJSON(&updateTagsRequest)
+	if err != nil {
+		responsejson.InternalServerError(ctx, err)
+		return
 	}
-	ctx.Header("Content-Type", "application/json")
-	ctx.JSON(http.StatusOK, webResponse)
+	err = controller.tagsService.Update(tagId, updateTagsRequest)
+	if err != nil {
+		if errors.Is(err, helper.ErrNotFound) {
+			responsejson.NotFound(ctx, err.Error())
+			return
+		}
+		if errors.Is(err, helper.ErrFailedValidation) {
+			responsejson.BadRequest(ctx, err)
+			return
+		}
+		responsejson.InternalServerError(ctx, err)
+		return
+	}
+
+	responsejson.Success(ctx, "update", nil)
 }
 
 func (controller *TagsController) Delete(ctx *gin.Context) {
 	tagId := ctx.Param("tagId")
 	id, err := strconv.Atoi(tagId)
-	helper.ErrorPanic(err)
-	controller.tagsService.Delete(id)
-
-	webResponse := data.Response{
-		Code:   http.StatusOK,
-		Status: "Ok",
-		Data:   nil,
+	if err != nil {
+		responsejson.InternalServerError(ctx, err)
+		return
 	}
-	ctx.Header("Content-Type", "application/json")
-	ctx.JSON(http.StatusOK, webResponse)
-}
-
-func (controller *TagsController) FindById(ctx *gin.Context) {
-	tagId := ctx.Param("tagId")
-	id, err := strconv.Atoi(tagId)
-	helper.ErrorPanic(err)
-
-	tagResponse := controller.tagsService.FindById(id)
-
-	webResponse := data.Response{
-		Code:   http.StatusOK,
-		Status: "Ok",
-		Data:   tagResponse,
+	err = controller.tagsService.Delete(id)
+	if err != nil {
+		if errors.Is(err, helper.ErrNotFound) {
+			responsejson.NotFound(ctx, err.Error())
+			return
+		}
+		responsejson.InternalServerError(ctx, err)
+		return
 	}
-	ctx.Header("Content-Type", "application/json")
-	ctx.JSON(http.StatusOK, webResponse)
-}
 
-func (controller *TagsController) FindAll(ctx *gin.Context) {
-	tagResponse := controller.tagsService.FindAll()
-	webResponse := data.Response{
-		Code:   http.StatusOK,
-		Status: "Ok",
-		Data:   tagResponse,
-	}
-	ctx.Header("Content-Type", "application/json")
-	ctx.JSON(http.StatusOK, webResponse)
-
+	responsejson.Success(ctx, "delete", nil)
 }

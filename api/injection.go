@@ -18,7 +18,7 @@ func InitializeTagsController() *controller.TagsController {
 	wire.Build(
 		controller.NewTagsController,
 		service.NewTagsServiceImpl,
-		repository.NewTagsREpositoryImpl,
+		repository.NewTagsRepositoryImpl,
 		config.DatabaseConnection,
 		config.NewValidator,
 	)

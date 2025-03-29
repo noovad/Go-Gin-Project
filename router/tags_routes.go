@@ -9,12 +9,12 @@ import (
 func TagsRouter(router *gin.Engine) {
 	controller := api.InitializeTagsController()
 
-	tagsRouter := router.Group("/tags")
+	tagsRouter := router.Group("/tag")
 	{
 		tagsRouter.GET("", controller.FindAll)
 		tagsRouter.GET("/:tagId", controller.FindById)
 		tagsRouter.POST("", controller.Create)
-		tagsRouter.PATCH("/:tagId", controller.Update)
+		tagsRouter.PUT("/:tagId", controller.Update)
 		tagsRouter.DELETE("/:tagId", controller.Delete)
 	}
 }
