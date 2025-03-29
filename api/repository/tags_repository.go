@@ -62,12 +62,17 @@ func (t *TagsRepositoryImpl) Update(tags model.Tags) error {
 }
 
 func (t *TagsRepositoryImpl) Delete(tagsId int) error {
-	result := t.Db.Delete(&model.Tags{}, tagsId)
-	if result.Error != nil {
+	var tag model.Tags
+	result := t.Db.First(&tag, tagsId)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return helper.ErrNotFound
+	} else if result.Error != nil {
 		return result.Error
 	}
-	if result.RowsAffected == 0 {
-		return helper.ErrNotFound
+
+	deleteResult := t.Db.Delete(&tag)
+	if deleteResult.Error != nil {
+		return deleteResult.Error
 	}
 	return nil
 }
