@@ -1,8 +1,6 @@
 //go:build wireinject
 // +build wireinject
 
-// wire_gen.go
-
 package api
 
 import (
