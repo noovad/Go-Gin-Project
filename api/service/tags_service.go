@@ -92,8 +92,5 @@ func (t *TagsServiceImpl) Update(tagId string, tag data.TagRequest) error {
 }
 
 func (t *TagsServiceImpl) Delete(tagId int) error {
-	if err := t.TagsRepository.Delete(tagId); err != nil {
-		return err
-	}
-	return nil
+	return t.TagsRepository.Delete(tagId)
 }
