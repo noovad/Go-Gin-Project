@@ -58,9 +58,8 @@ func setupTest() (*MockTagsService, *controller.TagsController, *gin.Engine) {
 	return mockService, controller, router
 }
 
-// Create tests
 func TestCreateTag(t *testing.T) {
-	t.Run("success - should create tag", func(t *testing.T) {
+	t.Run("should create tag successfully", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.POST("/tags", controller.Create)
 
@@ -78,7 +77,7 @@ func TestCreateTag(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should return internal server error", func(t *testing.T) {
+	t.Run("should return internal server error when service fails", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.POST("/tags", controller.Create)
 
@@ -95,7 +94,7 @@ func TestCreateTag(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should handle invalid JSON", func(t *testing.T) {
+	t.Run("should handle invalid JSON", func(t *testing.T) {
 		_, controller, router := setupTest()
 		router.POST("/tags", controller.Create)
 
@@ -109,7 +108,7 @@ func TestCreateTag(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
 
-	t.Run("error - should handle validation error", func(t *testing.T) {
+	t.Run("should handle validation error", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.POST("/tags", controller.Create)
 
@@ -127,9 +126,8 @@ func TestCreateTag(t *testing.T) {
 	})
 }
 
-// FindAll tests
 func TestFindAllTags(t *testing.T) {
-	t.Run("success - should return all tags", func(t *testing.T) {
+	t.Run("should return all tags successfully", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.GET("/tags", controller.FindAll)
 
@@ -149,7 +147,7 @@ func TestFindAllTags(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should handle server error", func(t *testing.T) {
+	t.Run("should handle server error", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.GET("/tags", controller.FindAll)
 
@@ -165,9 +163,8 @@ func TestFindAllTags(t *testing.T) {
 	})
 }
 
-// FindById tests
 func TestFindById(t *testing.T) {
-	t.Run("success - should return tag by ID", func(t *testing.T) {
+	t.Run("should return tag by ID successfully", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.GET("/tags/:tagId", controller.FindById)
 
@@ -184,7 +181,7 @@ func TestFindById(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should return not found", func(t *testing.T) {
+	t.Run("should return not found when tag doesn't exist", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.GET("/tags/:tagId", controller.FindById)
 
@@ -199,7 +196,7 @@ func TestFindById(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should return internal server error", func(t *testing.T) {
+	t.Run("should return internal server error when service fails", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.GET("/tags/:tagId", controller.FindById)
 
@@ -216,9 +213,8 @@ func TestFindById(t *testing.T) {
 	})
 }
 
-// Update tests
 func TestUpdateTag(t *testing.T) {
-	t.Run("success - should update tag", func(t *testing.T) {
+	t.Run("should update tag successfully", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.PUT("/tags/:tagId", controller.Update)
 
@@ -236,7 +232,7 @@ func TestUpdateTag(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should handle validation error", func(t *testing.T) {
+	t.Run("should handle validation error", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.PUT("/tags/:tagId", controller.Update)
 
@@ -254,7 +250,7 @@ func TestUpdateTag(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should return not found", func(t *testing.T) {
+	t.Run("should return not found when tag doesn't exist", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.PUT("/tags/:tagId", controller.Update)
 
@@ -272,7 +268,7 @@ func TestUpdateTag(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should handle invalid JSON", func(t *testing.T) {
+	t.Run("should handle invalid JSON", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.PUT("/tags/:tagId", controller.Update)
 
@@ -288,7 +284,7 @@ func TestUpdateTag(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should return internal server error", func(t *testing.T) {
+	t.Run("should return internal server error when service fails", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.PUT("/tags/:tagId", controller.Update)
 
@@ -307,9 +303,8 @@ func TestUpdateTag(t *testing.T) {
 	})
 }
 
-// Delete tests
 func TestDeleteTag(t *testing.T) {
-	t.Run("success - should delete tag", func(t *testing.T) {
+	t.Run("should delete tag successfully", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.DELETE("/tags/:tagId", controller.Delete)
 
@@ -325,7 +320,7 @@ func TestDeleteTag(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should return not found", func(t *testing.T) {
+	t.Run("should return not found when tag doesn't exist", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.DELETE("/tags/:tagId", controller.Delete)
 
@@ -340,7 +335,7 @@ func TestDeleteTag(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should handle invalid ID", func(t *testing.T) {
+	t.Run("should handle invalid ID format", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.DELETE("/tags/:tagId", controller.Delete)
 
@@ -354,7 +349,7 @@ func TestDeleteTag(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("error - should return internal server error", func(t *testing.T) {
+	t.Run("should return internal server error when service fails", func(t *testing.T) {
 		mockService, controller, router := setupTest()
 		router.DELETE("/tags/:tagId", controller.Delete)
 

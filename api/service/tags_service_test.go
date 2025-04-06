@@ -55,6 +55,7 @@ func setupTest() (*MockTagsRepository, service.TagsService) {
 	tagsService := service.NewTagsServiceImpl(mockRepo, validate)
 	return mockRepo, tagsService
 }
+
 func TestCreateTag(t *testing.T) {
 	mockRepo, tagsService := setupTest()
 	t.Run("should create a tag successfully", func(t *testing.T) {

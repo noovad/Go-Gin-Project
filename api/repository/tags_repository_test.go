@@ -117,6 +117,7 @@ func TestUpdateTag(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 }
+
 func TestDeleteTag(t *testing.T) {
 	db := setupTestDB()
 	repo := repository.NewTagsRepositoryImpl(db)
