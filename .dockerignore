@@ -1,0 +1,15 @@
+bin/
+*.exe
+*.test
+*.out
+
+.git
+.gitignore
+
+.vscode
+.idea
+
+.DS_Store
+
+# Docker
+docker-compose.override.yml
